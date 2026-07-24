@@ -1,0 +1,1977 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Miguel Beltran - Portfolio</title>
+  
+  <meta name="description" content="Personal portfolio of Miguel Beltran - vocalist, actor, and cybersecurity student. Featuring a sleek vintage GNOME-style design.">
+  <meta name="author" content="Miguel Beltran">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,600;0,800;1,400&family=Michroma&display=swap" rel="stylesheet">
+
+  <style>
+    /* ==========================================================================
+       DESIGN SYSTEM & CSS VARIABLES (DARK MODE ONLY WITH TERRACOTTA ACCENT)
+       ========================================================================== */
+    :root {
+      /* Typography */
+      --font-heading: 'Michroma', sans-serif;
+      --font-body: 'JetBrains Mono', monospace;
+
+      /* Strictly Dark Theme Warm Earth Tones */
+      --bg-main: rgba(26, 25, 24, 0.9);   /* Translucent dark warm base for drifting particles */
+      --bg-body-underlay: #1A1918;
+      --bg-window: #252321;      /* GNOME window bg */
+      --bg-sidebar: #1E1C1A;     /* Sidebar contrast bg */
+      --bg-card: #2D2A28;        /* Card background */
+      --bg-input: #33302D;       /* Input backgrounds */
+      --text-primary: #EBE5DB;   /* Warm cream text */
+      --text-secondary: #ADA69C; /* Secondary warm text */
+      --border-color: #383532;   /* Inset border color */
+      --shadow-color: rgba(0, 0, 0, 0.55);
+
+      /* Terracotta Accents */
+      --accent-color: #C05C3E;
+      --accent-color-light: #D47B62;
+      --accent-color-dark: #9F432A;
+      --accent-text: #F2EFE9;
+
+      /* Leathery Noise Overlay Texture */
+      --noise-bg: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.08'/%3E%3C/svg%3E");
+      
+      /* Transitions */
+      --transition-speed: 0.3s;
+    }
+
+    /* Base Reset & Core Styles */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-body-underlay);
+      color: var(--text-primary);
+      font-family: var(--font-body);
+      font-size: clamp(0.9rem, 1vw + 0.5rem, 1.05rem);
+      line-height: 1.6;
+      height: 100vh;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Full-screen Background Particle Canvas */
+    #bgParticlesCanvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    /* Scrollbar Style for GNOME theme */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: var(--bg-window);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: var(--border-color);
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--accent-color);
+    }
+
+    /* ==========================================================================
+       MAIN GNOME WINDOW CONTAINER (FULLSCREEN, NO BORDER, NO ROUNDED CORNERS)
+       ========================================================================== */
+    .gnome-window {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      height: 100vh;
+      margin: 0;
+      background-color: var(--bg-window);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* Window Headerbar */
+    .headerbar {
+      height: 54px;
+      background-color: var(--bg-sidebar);
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      user-select: none;
+      flex-shrink: 0;
+    }
+
+    .headerbar-left, .headerbar-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    /* Sidebar Toggle Button */
+    .sidebar-toggle {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-family: var(--font-body);
+      font-size: 0.85rem;
+      transition: background var(--transition-speed) ease;
+    }
+    .sidebar-toggle:hover {
+      background: var(--border-color);
+    }
+
+    /* Window Title */
+    .window-title {
+      font-family: var(--font-heading);
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-secondary);
+      pointer-events: none;
+      text-align: center;
+      flex-grow: 1;
+    }
+
+    /* ==========================================================================
+       WINDOW SPLIT LAYOUT (SIDEBAR & CONTENT)
+       ========================================================================== */
+    .window-body {
+      display: flex;
+      flex-grow: 1;
+      height: calc(100% - 54px);
+      position: relative;
+    }
+
+    /* Collapsible Left Sidebar (COLLAPSED BY DEFAULT) */
+    .gnome-sidebar {
+      width: 280px;
+      background-color: var(--bg-sidebar);
+      border-right: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      flex-shrink: 0;
+      transition: width var(--transition-speed) ease, transform var(--transition-speed) ease;
+      z-index: 10;
+    }
+
+    .gnome-sidebar.collapsed {
+      width: 0 !important;
+      min-width: 0 !important;
+      overflow: hidden;
+      border-right: none !important;
+    }
+
+    .sidebar-content {
+      padding: 20px 14px;
+      overflow-y: auto;
+      flex-grow: 1;
+    }
+
+    /* Sidebar Profile Header */
+    .sidebar-profile {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 25px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid var(--border-color);
+    }
+    .avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 8px;
+      background-color: var(--accent-color);
+      color: var(--accent-text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-heading);
+      font-weight: bold;
+      font-size: 1rem;
+      border: 1px solid var(--accent-color-dark);
+      background-image: var(--noise-bg);
+      background-blend-mode: overlay;
+    }
+    .profile-info {
+      display: flex;
+      flex-direction: column;
+    }
+    .profile-name {
+      font-family: var(--font-heading);
+      font-size: 0.8rem;
+      font-weight: bold;
+    }
+    .profile-sub {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+    }
+
+    /* Navigation Links (No Icons) */
+    .sidebar-nav {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .nav-item {
+      display: block;
+      padding: 10px 12px;
+      color: var(--text-primary);
+      text-decoration: none;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      transition: background 0.2s ease, color 0.2s ease;
+    }
+    .nav-item:hover {
+      background-color: var(--bg-card);
+    }
+    .nav-item.active {
+      background-color: var(--accent-color);
+      color: var(--accent-text);
+      background-image: var(--noise-bg);
+      background-blend-mode: overlay;
+    }
+
+    /* Nested/Collapsible Groups */
+    .nav-group {
+      margin-top: 4px;
+    }
+    .nav-group-trigger {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      background: none;
+      border: none;
+      color: var(--text-primary);
+      text-align: left;
+      cursor: pointer;
+      font-family: var(--font-body);
+      font-weight: 600;
+    }
+    .nav-group-trigger:hover {
+      background-color: var(--bg-card);
+    }
+    
+    .nav-group-items {
+      display: flex;
+      flex-direction: column;
+      padding-left: 12px;
+      gap: 2px;
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease-out, opacity 0.3s ease-out;
+      opacity: 0;
+    }
+    .nav-group-items.open {
+      max-height: 250px;
+      opacity: 1;
+      margin-top: 2px;
+    }
+    .nav-sub-item {
+      display: block;
+      padding: 8px 12px;
+      color: var(--text-secondary);
+      text-decoration: none;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      transition: background 0.2s ease, color 0.2s ease;
+    }
+    .nav-sub-item:hover {
+      background-color: var(--bg-card);
+      color: var(--text-primary);
+    }
+
+    /* Sidebar Footer Button */
+    .sidebar-footer {
+      padding: 14px;
+      border-top: 1px solid var(--border-color);
+    }
+    .btn-resume {
+      display: block;
+      width: 100%;
+      padding: 10px;
+      background-color: var(--accent-color);
+      color: var(--accent-text);
+      text-decoration: none;
+      text-align: center;
+      font-size: 0.85rem;
+      font-weight: bold;
+      border-radius: 6px;
+      border: 1px solid var(--accent-color-dark);
+      background-image: var(--noise-bg);
+      background-blend-mode: overlay;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .btn-resume:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    }
+
+    /* Right Main Scrollable Panel */
+    .main-content {
+      flex-grow: 1;
+      overflow-y: auto;
+      padding: 40px clamp(20px, 5vw, 60px);
+      scroll-behavior: smooth;
+      display: flex;
+      flex-direction: column;
+      gap: 60px;
+      background-color: var(--bg-main);
+      transition: background-color var(--transition-speed) ease;
+    }
+
+    /* ==========================================================================
+       TYPOGRAPHY AND SECTIONS
+       ========================================================================== */
+    section {
+      position: relative;
+    }
+    
+    .section-title {
+      font-family: var(--font-heading);
+      font-size: clamp(1.2rem, 2vw + 0.6rem, 1.8rem);
+      margin-bottom: 25px;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      overflow: hidden;
+    }
+
+    .section-title-text {
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    /* ==========================================================================
+       TAGLINE NEWS MARQUEE (INLINE LINE BREAK)
+       ========================================================================== */
+    .section-title .tagline-marquee {
+      flex-grow: 1;
+      min-width: 0;
+      overflow: hidden;
+      background: transparent;
+      border-top: 1px solid var(--border-color);
+      border-bottom: 1px solid var(--border-color);
+      padding: 6px 0;
+      display: flex;
+      align-items: center;
+      user-select: none;
+    }
+    .marquee-track {
+      display: flex;
+      width: max-content;
+      animation: marquee-scroll 45s linear infinite;
+    }
+    .marquee-text {
+      padding-right: 0;
+      font-family: var(--font-heading);
+      font-size: 0.75rem;
+      line-height: 1.2;
+      color: var(--accent-color);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      white-space: nowrap;
+    }
+    @keyframes marquee-scroll {
+      0% { transform: translate3d(0, 0, 0); }
+      100% { transform: translate3d(-50%, 0, 0); }
+    }
+
+    /* ==========================================================================
+       HOME SECTION (PLAIN STATIC/HORIZONTAL CAROUSEL)
+       ========================================================================== */
+    .intro-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 40px;
+      align-items: center;
+    }
+
+    .hero-text h1 {
+      font-family: var(--font-heading);
+      font-size: clamp(2rem, 4vw + 1rem, 3.5rem);
+      line-height: 1.1;
+      margin-bottom: 15px;
+      color: var(--text-primary);
+    }
+    
+    .hero-text .accent-text-glow {
+      color: var(--accent-color);
+      font-style: italic;
+    }
+
+    .hero-text p {
+      font-size: 1.1rem;
+      color: var(--text-secondary);
+      margin-bottom: 25px;
+      max-width: 600px;
+    }
+
+    /* Plain Carousel Wrapper */
+    .carousel-section {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      align-items: center;
+    }
+
+    .plain-carousel {
+      position: relative;
+      width: clamp(260px, 20vw + 100px, 320px);
+      height: clamp(320px, 25vw + 120px, 380px);
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 4px 15px var(--shadow-color);
+    }
+
+    .carousel-slides-wrapper {
+      position: relative;
+      flex-grow: 1;
+      width: 100%;
+      height: 100%;
+    }
+
+    .carousel-slide {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.4s ease, visibility 0.4s ease;
+      display: flex;
+      flex-direction: column;
+      padding: 12px;
+    }
+
+    .carousel-slide.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .carousel-image-container {
+      width: 100%;
+      flex-grow: 1;
+      border: 1px solid rgba(255,255,255,0.03);
+      background-size: cover;
+      background-position: center;
+      position: relative;
+      overflow: hidden;
+      background-color: var(--bg-sidebar);
+    }
+
+    /* Fallback colorful gradients */
+    .polaroid-placeholder-gradient {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #FFF;
+      font-family: var(--font-heading);
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      text-align: center;
+      padding: 20px;
+    }
+
+    /* Little title caption at the bottom of the photo box wrapper */
+    .carousel-caption {
+      font-family: var(--font-body);
+      font-size: 0.9rem;
+      font-weight: bold;
+      color: var(--text-primary);
+      margin-top: 12px;
+      text-align: center;
+      border-top: 1px dashed var(--border-color);
+      padding-top: 8px;
+    }
+
+    /* Hotspot Arrows for Carousel Navigation */
+    .carousel-nav-hotspots {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      z-index: 15;
+      pointer-events: none;
+    }
+    .hotspot {
+      flex: 1;
+      pointer-events: auto;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      background: linear-gradient(to right, rgba(0,0,0,0.1), transparent);
+    }
+    .hotspot.hotspot-right {
+      justify-content: flex-end;
+      background: linear-gradient(to left, rgba(0,0,0,0.1), transparent);
+    }
+    .hotspot:hover {
+      opacity: 1;
+    }
+    .hotspot-arrow {
+      background: var(--bg-window);
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+      font-size: 0.9rem;
+      user-select: none;
+    }
+
+    /* ==========================================================================
+       ABOUT SECTION (FULL PAGE WIDTH INTERSPERSED BIO LAYOUT WITH 3 PICTURES)
+       ========================================================================== */
+    .about-fullwidth {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 40px;
+    }
+
+    .bio-row {
+      display: flex;
+      align-items: center;
+      gap: 40px;
+      width: 100%;
+    }
+
+    .bio-row.reverse {
+      flex-direction: row-reverse;
+    }
+
+    .bio-text-block {
+      flex: 1.3;
+    }
+
+    .bio-text-block p {
+      font-size: 1.05rem;
+      color: var(--text-secondary);
+      line-height: 1.7;
+    }
+
+    .bio-pic-container {
+      flex: 0.7;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-width: 250px;
+    }
+
+    /* Custom Photo Placeholder Card Styles (Separated from Canvas) */
+    .bio-photo-card {
+      width: 250px;
+      height: 250px;
+      background: var(--bg-card);
+      border: 2px dashed var(--accent-color);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-secondary);
+      font-size: 0.75rem;
+      font-weight: bold;
+      text-transform: uppercase;
+      text-align: center;
+      padding: 20px;
+      position: relative;
+      box-shadow: 0 4px 12px var(--shadow-color);
+      transition: border-color var(--transition-speed) ease, background-color var(--transition-speed) ease;
+    }
+    .bio-photo-card:hover {
+      border-style: solid;
+      background-color: var(--bg-sidebar);
+    }
+    .bio-photo-card img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+
+    #blobCanvas {
+      width: 250px;
+      height: 250px;
+      cursor: pointer;
+      filter: drop-shadow(0 8px 16px var(--shadow-color));
+    }
+
+    .meta-location {
+      font-family: var(--font-heading);
+      font-size: 0.85rem;
+      color: var(--accent-color);
+      margin-bottom: 12px;
+      display: inline-block;
+    }
+
+    /* Responsive Stacking for Bio Rows */
+    @media (max-width: 820px) {
+      .bio-row, .bio-row.reverse {
+        flex-direction: column;
+        gap: 20px;
+        text-align: center;
+      }
+      .bio-pic-container {
+        width: 100%;
+      }
+    }
+
+    /* ==========================================================================
+       WORK SECTION (GNOME GRID VIEW)
+       ========================================================================== */
+    .project-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 20px;
+    }
+
+    .project-card {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      overflow: hidden;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 3px 6px var(--shadow-color);
+      transition: transform 0.2s ease, box-shadow 0.2s ease, background-color var(--transition-speed) ease, border-color var(--transition-speed) ease;
+    }
+    .project-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 16px var(--shadow-color);
+    }
+
+    .project-thumb {
+      height: 150px;
+      background-size: cover;
+      background-position: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-bottom: 1px solid var(--border-color);
+      position: relative;
+    }
+    .project-thumb-label {
+      font-family: var(--font-heading);
+      font-size: 0.8rem;
+      color: #FFF;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+      text-transform: uppercase;
+      text-align: center;
+      padding: 0 10px;
+    }
+
+    .project-body {
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      flex-grow: 1;
+    }
+
+    .project-card-title {
+      font-family: var(--font-heading);
+      font-size: 0.85rem;
+      margin-bottom: 8px;
+      color: var(--text-primary);
+    }
+
+    .project-card-desc {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    /* ==========================================================================
+       SKILLS SECTION (BULLETED LIST LAYOUT - NO ICONS)
+       ========================================================================== */
+    .skills-grid-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+      padding-left: 20px;
+    }
+
+    .skills-grid-list li {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      padding: 14px 18px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      list-style-type: square;
+      transition: border-color var(--transition-speed) ease, background-color var(--transition-speed) ease;
+    }
+    .skills-grid-list li:hover {
+      border-color: var(--accent-color);
+      background-color: var(--bg-sidebar);
+    }
+
+    /* ==========================================================================
+       CONTACT & FOOTER (NO ICONS)
+       ========================================================================== */
+    .contact-layout {
+      display: grid;
+      grid-template-columns: 1fr 1.2fr;
+      gap: 40px;
+    }
+
+    .contact-info-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .contact-text {
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+    }
+
+    .social-links {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .social-link {
+      display: inline-block;
+      color: var(--text-primary);
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 600;
+      transition: color 0.2s ease;
+    }
+
+    .social-link:hover {
+      color: var(--accent-color);
+    }
+
+    /* Contact Form (Styled like Gnome Settings Form) */
+    .contact-form {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      padding: 24px;
+      box-shadow: 0 4px 10px var(--shadow-color);
+      transition: background-color var(--transition-speed) ease, border-color var(--transition-speed) ease;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .form-label {
+      font-size: 0.75rem;
+      font-weight: bold;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+    }
+
+    .form-control {
+      background-color: var(--bg-input);
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
+      font-family: var(--font-body);
+      font-size: 0.9rem;
+      padding: 10px 14px;
+      outline: none;
+      transition: border-color 0.2s ease, background-color 0.2s ease;
+    }
+
+    .form-control:focus {
+      border-color: var(--accent-color);
+    }
+
+    .btn-submit {
+      background-color: var(--accent-color);
+      color: var(--accent-text);
+      font-family: var(--font-body);
+      font-weight: bold;
+      font-size: 0.9rem;
+      padding: 12px;
+      border: 1px solid var(--accent-color-dark);
+      cursor: pointer;
+      background-image: var(--noise-bg);
+      background-blend-mode: overlay;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      text-align: center;
+    }
+    .btn-submit:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    }
+
+    /* Vintage Status Bar (Window Footer) */
+    .statusbar {
+      height: 28px;
+      background-color: var(--bg-sidebar);
+      border-top: 1px solid var(--border-color);
+      padding: 0 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.7rem;
+      color: var(--text-secondary);
+      user-select: none;
+      flex-shrink: 0;
+      transition: background-color var(--transition-speed) ease, border-color var(--transition-speed) ease;
+    }
+
+    /* ==========================================================================
+       GNOME SYSTEM DETAIL MODAL WINDOW (NO ICONS)
+       ========================================================================== */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.65);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-container {
+      width: 90%;
+      max-width: 650px;
+      background-color: var(--bg-window);
+      border: 1px solid var(--border-color);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      transform: scale(0.9);
+      transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .modal-overlay.active .modal-container {
+      transform: scale(1);
+    }
+
+    .modal-headerbar {
+      height: 48px;
+      background-color: var(--bg-sidebar);
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+    }
+
+    .modal-title-text {
+      font-family: var(--font-heading);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+      letter-spacing: 1px;
+    }
+
+    .btn-modal-close {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
+      padding: 4px 10px;
+      cursor: pointer;
+      font-family: var(--font-body);
+      font-size: 0.8rem;
+      font-weight: bold;
+      transition: background-color 0.2s ease;
+    }
+    .btn-modal-close:hover {
+      background-color: var(--border-color);
+    }
+
+    .modal-body {
+      padding: 24px;
+      overflow-y: auto;
+      max-height: 80vh;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .modal-hero-thumb {
+      height: 220px;
+      border: 1px solid var(--border-color);
+      background-size: cover;
+      background-position: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-project-title {
+      font-family: var(--font-heading);
+      font-size: 1.1rem;
+      color: var(--text-primary);
+    }
+
+    .modal-project-field {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      font-weight: bold;
+      color: var(--accent-color);
+      letter-spacing: 1px;
+      margin-top: -12px;
+    }
+
+    .modal-project-desc {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    .modal-project-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 10px;
+    }
+
+    .btn-modal-action {
+      flex: 1;
+      padding: 10px;
+      text-align: center;
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: bold;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    
+    .btn-modal-action.primary {
+      background-color: var(--accent-color);
+      color: var(--accent-text);
+      border: 1px solid var(--accent-color-dark);
+      background-image: var(--noise-bg);
+      background-blend-mode: overlay;
+    }
+    .btn-modal-action.primary:hover {
+      transform: translateY(-1px);
+    }
+
+    .btn-modal-action.secondary {
+      background-color: var(--bg-card);
+      color: var(--text-primary);
+      border: 1px solid var(--border-color);
+    }
+    .btn-modal-action.secondary:hover {
+      background-color: var(--border-color);
+    }
+
+    /* ==========================================================================
+       RESPONSIVE ADAPTATIONS (MOBILE)
+       ========================================================================== */
+    @media (max-width: 900px) {
+      .intro-grid {
+        grid-template-columns: 1fr;
+        gap: 30px;
+      }
+      .carousel-section {
+        order: -1;
+      }
+      .contact-layout {
+        grid-template-columns: 1fr;
+        gap: 30px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      body {
+        font-size: 0.95rem;
+      }
+      
+      .gnome-window {
+        width: 100%;
+        height: 100vh;
+        margin: 0;
+        border: none;
+      }
+
+      .window-body {
+        height: calc(100% - 54px);
+      }
+
+      /* Drawer-style sidebar on mobile */
+      .gnome-sidebar {
+        position: absolute;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        width: 280px;
+        transform: translateX(-100%);
+        box-shadow: none;
+      }
+
+      .gnome-sidebar.open-mobile {
+        transform: translateX(0);
+        width: 280px;
+        box-shadow: 10px 0 30px rgba(0,0,0,0.3);
+      }
+
+      /* When collapsed on mobile, it should stay offscreen */
+      .gnome-sidebar.collapsed {
+        width: 280px !important;
+        transform: translateX(-100%);
+        border-right: 1px solid var(--border-color) !important;
+      }
+      .gnome-sidebar.collapsed.open-mobile {
+        transform: translateX(0);
+      }
+
+      .main-content {
+        padding: 24px 16px;
+      }
+    }
+  </style>
+</head>
+<body data-theme="dark">
+
+  <canvas id="bgParticlesCanvas"></canvas>
+
+  <main class="gnome-window">
+    
+    <header class="headerbar">
+      <div class="headerbar-left">
+        <button class="sidebar-toggle" id="sidebarToggleBtn" aria-label="Toggle Navigation Sidebar">
+          Menu
+        </button>
+      </div>
+
+      <h2 class="window-title">Jack of no trades, master of some</h2>
+
+      <div class="headerbar-right">
+        </div>
+    </header>
+
+    <div class="window-body">
+      
+      <aside class="gnome-sidebar collapsed" id="sidebar">
+        <div class="sidebar-content">
+          
+          <div class="sidebar-profile">
+            <div class="avatar">MB</div>
+            <div class="profile-info">
+              <span class="profile-name">Miguel Beltran</span>
+              <span class="profile-sub">Please hire me I'm very broke</span>
+            </div>
+          </div>
+
+          <nav class="sidebar-nav">
+            <a href="#home" class="nav-item active" id="nav-home">Home</a>
+            <a href="#about" class="nav-item" id="nav-about">About</a>
+            
+            <div class="nav-group">
+              <button class="nav-item nav-group-trigger" onclick="toggleNavGroup(this)" aria-expanded="true">
+                <span>Projects</span>
+                <span class="nav-group-arrow open">▶</span>
+              </button>
+              <div class="nav-group-items open" id="sidebarProjectsList">
+                </div>
+            </div>
+
+            <a href="#skills" class="nav-item" id="nav-skills">Skills</a>
+            <a href="#contact" class="nav-item" id="nav-contact">Contact</a>
+          </nav>
+        </div>
+
+        <div class="sidebar-footer">
+          <a href="resume.pdf" class="btn-resume" download="Miguel_Beltran_Resume.pdf">
+            Download Resume
+          </a>
+        </div>
+      </aside>
+
+      <div class="main-content" id="mainContent">
+
+        <section id="home" class="content-section">
+          <div class="intro-grid">
+            
+            <div class="hero-text">
+              <h1>Hi, I'm <span class="accent-text-glow">Miguel</span>.</h1>
+              <p>Queens based High schooler who enjoys music, drama, and putzing with computers.</p>
+              <button class="btn-submit" onclick="document.getElementById('contact').scrollIntoView({ behavior: 'smooth' });">Get in Touch</button>
+            </div>
+
+            <div class="carousel-section">
+              <div class="plain-carousel">
+                <div class="carousel-slides-wrapper" id="carouselSlidesWrapper">
+                  
+                  <div class="carousel-slide active" data-index="0">
+                    <div class="carousel-image-container">
+                      <div class="polaroid-placeholder-gradient" style="background: linear-gradient(135deg, #A85A32, #DDD7C9);">
+                        Stage Production
+                      </div>
+                    </div>
+                    <div class="carousel-caption">Into the Woods (Encores!)</div>
+                  </div>
+
+                  <div class="carousel-slide" data-index="1">
+                    <div class="carousel-image-container">
+                      <div class="polaroid-placeholder-gradient" style="background: linear-gradient(135deg, #606C38, #282523);">
+                        Illustration award
+                      </div>
+                    </div>
+                    <div class="carousel-caption">Baruch college newsies award</div>
+                  </div>
+
+                  <div class="carousel-slide" data-index="2">
+                    <div class="carousel-image-container">
+                      <div class="polaroid-placeholder-gradient" style="background: linear-gradient(135deg, #C68B45, #1E1C1A);">
+                        Classical choir
+                      </div>
+                    </div>
+                    <div class="carousel-caption">Carnige hall w/ ACC</div>
+                  </div>
+
+                  <div class="carousel-slide" data-index="3">
+                    <div class="carousel-image-container">
+                      <div class="polaroid-placeholder-gradient" style="background: linear-gradient(135deg, #4E6E81, #E8E2D5);">
+                        Homelab setup server
+                      </div>
+                    </div>
+                    <div class="carousel-caption">Running home server</div>
+                  </div>
+
+                </div>
+
+                <div class="carousel-nav-hotspots">
+                  <div class="hotspot hotspot-left" id="carouselLeftBtn" title="Previous Slide">
+                    <div class="hotspot-arrow">◀</div>
+                  </div>
+                  <div class="hotspot hotspot-right" id="carouselRightBtn" title="Next Slide">
+                    <div class="hotspot-arrow">▶</div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        <section id="about" class="content-section">
+          <h2 class="section-title">
+            <span class="section-title-text">About Me</span>
+            <div class="tagline-marquee">
+              <div class="marquee-track">
+                <span class="marquee-text">hey guys look i made a website its really cool right i know thanks i made it myself my mother is very proud hey guys look i made a website its really cool right i know thanks i made it myself my mother is very proud &nbsp;</span>
+                <span class="marquee-text">hey guys look i made a website its really cool right i know thanks i made it myself my mother is very proud hey guys look i made a website its really cool right i know thanks i made it myself my mother is very proud &nbsp;</span>
+              </div>
+            </div>
+          </h2>
+          
+          <div class="about-fullwidth">
+            
+
+            <div class="bio-row">
+              <div class="bio-pic-container">
+                <div class="bio-photo-card" title="Placeholder Photo 3">
+                  <span>[EDIT] Mugshot</span>
+                </div>
+              </div>
+              <div class="bio-text-block">
+                <p>
+                  I am a New York-based vocalist & actor (and ukuleleist, but that sounds slightly less cool) who got my start at age 4 tagging along with my parents singing at local karaoke bars, and working as a background actor on film & TV from age 3.
+                </p>
+              </div>
+            </div>
+
+            <div class="bio-row reverse">
+              <div class="bio-pic-container">
+                <div class="bio-photo-card" title="Placeholder Photo 2">
+                  <span>[EDIT] Performance photo</span>
+                </div>
+              </div>
+              <div class="bio-text-block">
+                <p>
+                  Since then, I have performed as part of New York City Center's revivals of <em>Into the Woods</em> & Lionel Bart's <em>Oliver!</em> (ensemble), sung at Carnegie Hall twice with the All-City High School Chorus, and won first place (and second the year before) for illustration at Baruch College's Excellence in high school journalism awards.
+                </p>
+              </div>
+            </div>
+
+            <div class="bio-row">
+              <div class="bio-pic-container">
+                <div class="bio-photo-card" title="Placeholder Photo 3">
+                  <span>[EDIT] Server taped to wall</span>
+                </div>
+              </div>
+              <div class="bio-text-block">
+                <p>
+                  Recently, I have begun to branch out into computer science (the arts are not particularly stable career choices), and am currently studying cybersecurity at NYU Tandon. Aside from that, I enjoy homelabbing, learning guitar (very badly), taking long walks on the beach at sunset, and restoring old computers I find in the trash or at flea markets.
+                </p>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        <section id="work" class="content-section">
+          <h2 class="section-title">
+            <span class="section-title-text">Previous Work</span>
+            <div class="tagline-marquee">
+              <div class="marquee-track">
+                <span class="marquee-text">hey guys look at all the cool stuff i have done doesn't this make me such an interesting person i know right hey guys look at all the cool stuff i have done doesn't this make me such an interesting person i know right &nbsp;</span>
+                <span class="marquee-text">hey guys look at all the cool stuff i have done doesn't this make me such an interesting person i know right hey guys look at all the cool stuff i have done doesn't this make me such an interesting person i know right &nbsp;</span>
+              </div>
+            </div>
+          </h2>
+          
+          <div class="project-grid">
+
+            <div class="project-card" onclick="openProjectModal(0)">
+              <div class="project-thumb" style="background: linear-gradient(135deg, var(--accent-color), var(--border-color));">
+                <span class="project-thumb-label">Intrusion Lab</span>
+              </div>
+              <div class="project-body">
+                <h3 class="project-card-title">Cybersecurity Homelab</h3>
+              </div>
+              
+              <template class="project-details-template">
+                <h3 class="modal-project-title">Cybersecurity Homelab</h3>
+                <span class="modal-project-field">Infrastructure & SecOps</span>
+                <div class="modal-hero-thumb" style="background: linear-gradient(135deg, var(--accent-color), var(--border-color));">
+                  <span class="project-thumb-label" style="font-size: 1.2rem;">Homelab Infrastructure</span>
+                </div>
+                <p class="modal-project-desc">
+                  In this project, I used a 2014 mac mini running debian server as a docker host (via casaos) to run things like Jellyfin (DVD/VHS collection backup), Immich (family photo backup), and minecraft servers (allow me *some* frivolities).
+                </p>
+                <div class="modal-project-tags">
+                  <span class="tag">Docker</span>
+                  <span class="tag">Networking</span>
+                  <span class="tag">Virtualization</span>
+                  <span class="tag">Linux</span>
+                </div>
+                <div class="modal-actions">
+                  <a href="https://github.com/placeholder/homelab" target="_blank" class="btn-modal-action primary">View Code Repo</a>
+                  <a href="#" class="btn-modal-action secondary" onclick="closeProjectModal(event)">Return to Site</a>
+                </div>
+              </template>
+            </div>
+
+            <div class="project-card" onclick="openProjectModal(1)">
+              <div class="project-thumb" style="background: linear-gradient(135deg, var(--accent-color-light), var(--accent-color-dark));">
+                <span class="project-thumb-label">Choral Vocals</span>
+              </div>
+              <div class="project-body">
+                <h3 class="project-card-title">Into The Woods Revival</h3>
+              </div>
+              
+              <template class="project-details-template">
+                <h3 class="modal-project-title">Into The Woods revival</h3>
+                <span class="modal-project-field">Vocal Performance & Theater</span>
+                <div class="modal-hero-thumb" style="background: linear-gradient(135deg, var(--accent-color-light), var(--accent-color-dark));">
+                  <span class="project-thumb-label" style="font-size: 1.2rem;">Stage Production</span>
+                </div>
+                <p class="modal-project-desc">
+                  Performed along with other precocious middle schoolers as a part of a community ensemble, working with professionals like Neil Patrick Harris, James Ortiz, Gavin Creel, and more.
+                </p>
+                <div class="modal-project-tags">
+                  <span class="tag">Group singing</span>
+                  <span class="tag">Acting</span>
+                  <span class="tag">Stagecraft</span>
+                </div>
+                <div class="modal-actions">
+                  <a href="https://www.nycitycenter.org" target="_blank" class="btn-modal-action primary">Production Info</a>
+                  <a href="#" class="btn-modal-action secondary" onclick="closeProjectModal(event)">Return to Site</a>
+                </div>
+              </template>
+            </div>
+
+            <div class="project-card" onclick="openProjectModal(2)">
+              <div class="project-thumb" style="background: linear-gradient(135deg, var(--accent-color-dark), var(--border-color));">
+                <span class="project-thumb-label">Stage Ensemble</span>
+              </div>
+              <div class="project-body">
+                <h3 class="project-card-title">Oliver! revival</h3>
+              </div>
+              
+              <template class="project-details-template">
+                <h3 class="modal-project-title">Oliver! Ensemble</h3>
+                <span class="modal-project-field">Theatrical Vocal Performance</span>
+                <div class="modal-hero-thumb" style="background: linear-gradient(135deg, var(--accent-color-dark), var(--border-color));">
+                  <span class="project-thumb-label" style="font-size: 1.2rem;">Lionel Bart's Oliver!</span>
+                </div>
+                <p class="modal-project-desc">
+                  Performed with a team of about 30 other students in NYCC's 2023 revival of Oliver!, getting a taste for the inner workings of a stage production, and working with professionals like Lili Cooper & Raul Esparza.
+                </p>
+                <div class="modal-project-tags">
+                  <span class="tag">Choral Harmonies</span>
+                  <span class="tag">Theatrical Arts</span>
+                  <span class="tag">Stage Performance</span>
+                </div>
+                <div class="modal-actions">
+                  <a href="#" class="btn-modal-action primary">Stage Gallery</a>
+                  <a href="#" class="btn-modal-action secondary" onclick="closeProjectModal(event)">Return to Site</a>
+                </div>
+              </template>
+            </div>
+
+            <div class="project-card" onclick="openProjectModal(3)">
+              <div class="project-thumb" style="background: linear-gradient(135deg, var(--bg-sidebar), var(--accent-color));">
+                <span class="project-thumb-label">Comic/illustration snippet</span>
+              </div>
+              <div class="project-body">
+                <h3 class="project-card-title">Illustration</h3>
+              </div>
+              
+              <template class="project-details-template">
+                <h3 class="modal-project-title">Newspaper illustration</h3>
+                <span class="modal-project-field">Cartooning</span>
+                <div class="modal-hero-thumb" style="background: linear-gradient(135deg, var(--bg-sidebar), var(--accent-color));">
+                  <span class="project-thumb-label" style="font-size: 1.2rem;">Electronics Bench</span>
+                </div>
+                <p class="modal-project-desc">
+                  Since 2024, I have been leading the illustation department for my school's newspaper (QHSS, #1 school in NYC as per USschools), and my own contributions have recieved 2 awards from the Newsies- an awards organization run by baruch college celebrating excellence in high school journalism.
+                </p>
+                <div class="modal-project-tags">
+                  <span class="tag">2d Illustration</span>
+                  <span class="tag">Writing</span>
+                  <span class="tag">Team management</span>
+                </div>
+                <div class="modal-actions">
+                  <a href="#" class="btn-modal-action primary">Restoration Blog</a>
+                  <a href="#" class="btn-modal-action secondary" onclick="closeProjectModal(event)">Return to Site</a>
+                </div>
+              </template>
+            </div>
+
+          </div>
+        </section>
+
+        <section id="skills" class="content-section">
+          <h2 class="section-title">
+            <span class="section-title-text">Core Skills</span>
+            <div class="tagline-marquee">
+              <div class="marquee-track">
+                <span class="marquee-text">hey guys look at all the things i can do aren't i such a cool person that you would just love to hire hey guys look at all the things i can do aren't i such a cool person that you would just love to hire &nbsp;</span>
+                <span class="marquee-text">hey guys look at all the things i can do aren't i such a cool person that you would just love to hire hey guys look at all the things i can do aren't i such a cool person that you would just love to hire &nbsp;</span>
+              </div>
+            </div>
+          </h2>
+          
+          <ul class="skills-grid-list">
+            <li>Linux (GUI/CLI)</li>
+            <li>Docker</li>
+            <li>Computer Diagnostics & Repair</li>
+            <li>Singing (solo, chorus)</li>
+            <li>Stage performance</li>
+            <li>Writing (stage, film)<li>
+            <li>2d Illustration</li>
+            <li>Basic networking</li>
+            <li>3d printing</li>
+            <li>3d modeling (sculture/CAD)<li>
+          </ul>
+        </section>
+
+        <section id="contact" class="content-section">
+          <h2 class="section-title">
+            <span class="section-title-text">Contact</span>
+            <div class="tagline-marquee">
+              <div class="marquee-track">
+                <span class="marquee-text">hey hey look you can contact me and look at my socials and stuff in case you want to work with me on something right right you do right hey hey look you can contact me and look at my socials and stuff in case you want to work with me on something right right you do right &nbsp;</span>
+                <span class="marquee-text">hey hey look you can contact me and look at my socials and stuff in case you want to work with me on something right right you do right hey hey look you can contact me and look at my socials and stuff in case you want to work with me on something right right you do right &nbsp;</span>
+              </div>
+            </div>
+          </h2>
+          
+          <div class="contact-layout">
+            <div class="contact-info-panel">
+              <p class="contact-text">
+                Want to hear more from me (for some reason)? Get in touch here:
+              </p>
+              
+              <div class="social-links">
+                <a href="mailto:metalheadanimates@gmail.com" class="social-link">
+                  Email: metalheadanimates@gmail.com
+                </a>
+                <a href="https://github.com/FlibbityJibbity1" target="_blank" class="social-link">
+                  GitHub Profile
+                </a>
+                <a href="https://www.linkedin.com/in/miguel-beltran-123820326/" target="_blank" class="social-link">
+                  LinkedIn Profile
+                </a>
+                <a href="https://www.instagram.com/flibbityjibbity1/" target="_blank" class="social-link">
+                  Instagram Profile
+                </a>
+              </div>
+            </div>
+
+            <form class="contact-form" action="#" method="POST" onsubmit="event.preventDefault(); alert('Message sent! (Form placeholder logic triggered)');">
+              <div class="form-group">
+                <label for="form-name" class="form-label">Full Name</label>
+                <input type="text" id="form-name" class="form-control" placeholder="Jane Doe" required>
+              </div>
+              <div class="form-group">
+                <label for="form-email" class="form-label">Email Address</label>
+                <input type="email" id="form-email" class="form-control" placeholder="jane@example.com" required>
+              </div>
+              <div class="form-group">
+                <label for="form-msg" class="form-label">Your Message</label>
+                <textarea id="form-msg" class="form-control" rows="4" placeholder="Hi! I have recently come into a large fortune and would love to gift..." required></textarea>
+              </div>
+              <button type="submit" class="btn-submit">
+                Send Message
+              </button>
+            </form>
+          </div>
+        </section>
+
+      </div>
+    </div>
+
+    <footer class="statusbar">
+      <span>Theme: Dark (Terracotta Accent)</span>
+      <span id="statusBarScroll">Miguel Beltran Portfolio v1.0.0</span>
+    </footer>
+
+  </main>
+
+  <div class="modal-overlay" id="projectModalOverlay" onclick="closeProjectModal(event)">
+    <div class="modal-container" onclick="event.stopPropagation()">
+      <div class="modal-headerbar">
+        <span class="modal-title-text">Project Details</span>
+        <button class="btn-modal-close" onclick="closeProjectModal(event)">
+          Close
+        </button>
+      </div>
+      <div class="modal-body" id="modalBodyContent">
+        </div>
+    </div>
+  </div>
+
+  <script>
+    // ==========================================================================
+    // SAFE LOCAL STORAGE WRAPPER (Prevents crashes in sandboxed double-clicked environments)
+    // ==========================================================================
+    const safeStorage = {
+      getItem(key) {
+        try {
+          return localStorage.getItem(key);
+        } catch (e) {
+          return null;
+        }
+      },
+      setItem(key, value) {
+        try {
+          localStorage.setItem(key, value);
+        } catch (e) {
+          // Fail silently without halting script execution
+        }
+      }
+    };
+
+    // ==========================================================================
+    // THEME AND COLOR CONTROLLERS (FORCE DARK & TERRACOTTA ONLY)
+    // ==========================================================================
+    const currentTheme = 'dark';
+    const currentAccent = '#C05C3E';
+    const currentAccentLight = '#D47B62';
+    const currentAccentDark = '#9F432A';
+
+    // Theme initialization
+    function initTheme() {
+      document.body.setAttribute('data-theme', currentTheme);
+      setAccentColors(currentAccent, currentAccentLight, currentAccentDark);
+    }
+
+    // Set accent colors inside :root variables
+    function setAccentColors(accent, light, dark) {
+      document.documentElement.style.setProperty('--accent-color', accent);
+      document.documentElement.style.setProperty('--accent-color-light', light);
+      document.documentElement.style.setProperty('--accent-color-dark', dark);
+    }
+
+
+    // ==========================================================================
+    // SIDEBAR NAVIGATION & MOBILE LAYOUT CONTROLLER
+    // ==========================================================================
+    const sidebar = document.getElementById('sidebar');
+    const sidebarToggleBtn = document.getElementById('sidebarToggleBtn');
+    const mainContent = document.getElementById('mainContent');
+    const navItems = document.querySelectorAll('.nav-item');
+    const contentSections = document.querySelectorAll('.content-section');
+
+    // Sidebar navigation active highlight tracker
+    mainContent.addEventListener('scroll', () => {
+      let currentSection = 'home';
+      
+      contentSections.forEach(section => {
+        const sectionTop = section.offsetTop;
+        const sectionHeight = section.clientHeight;
+        if (mainContent.scrollTop >= (sectionTop - 120)) {
+          currentSection = section.getAttribute('id');
+        }
+      });
+
+      navItems.forEach(item => {
+        item.classList.remove('active');
+        if (item.getAttribute('href') === `#${currentSection}`) {
+          item.classList.add('active');
+        }
+      });
+    });
+
+    // Toggle Sidebar menu drawer on mobile/desktop
+    sidebarToggleBtn.addEventListener('click', () => {
+      if (window.innerWidth <= 768) {
+        sidebar.classList.toggle('open-mobile');
+      } else {
+        sidebar.classList.toggle('collapsed');
+      }
+    });
+
+    // Close mobile menu drawer on nav clicks
+    navItems.forEach(item => {
+      item.addEventListener('click', (e) => {
+        if (item.classList.contains('nav-group-trigger')) return;
+        if (window.innerWidth <= 768) {
+          sidebar.classList.remove('open-mobile');
+        }
+      });
+    });
+
+    // Projects group toggle list animation inside Sidebar
+    function toggleNavGroup(button) {
+      const parent = button.parentElement;
+      const arrow = button.querySelector('.nav-group-arrow');
+      const itemsList = parent.querySelector('.nav-group-items');
+
+      const isOpen = itemsList.classList.contains('open');
+      if (isOpen) {
+        itemsList.classList.remove('open');
+        arrow.innerText = '▶';
+        button.setAttribute('aria-expanded', 'false');
+      } else {
+        itemsList.classList.add('open');
+        arrow.innerText = '▼';
+        button.setAttribute('aria-expanded', 'true');
+      }
+    }
+
+
+    // ==========================================================================
+    // PROJECT DYNAMIC MODAL BOX AND SIDEBAR SUB-BULLETS DYNAMICS
+    // ==========================================================================
+    const projectGrid = document.querySelector('.project-grid');
+    const projectCards = Array.from(projectGrid.querySelectorAll('.project-card'));
+    const sidebarProjectsList = document.getElementById('sidebarProjectsList');
+    const projectModalOverlay = document.getElementById('projectModalOverlay');
+    const modalBodyContent = document.getElementById('modalBodyContent');
+
+    // 1. Build sub-navigation links dynamically in the sidebar based on project entries in the HTML!
+    function generateSidebarProjects() {
+      sidebarProjectsList.innerHTML = ''; // Reset
+      projectCards.forEach((card, index) => {
+        const titleElement = card.querySelector('.project-card-title');
+        if (!titleElement) return;
+
+        const subItem = document.createElement('a');
+        subItem.href = '#work';
+        subItem.className = 'nav-sub-item';
+        subItem.innerText = titleElement.innerText;
+        subItem.title = titleElement.innerText;
+
+        // Clicking sub-item redirects context and triggers project overlay window
+        subItem.addEventListener('click', (e) => {
+          e.preventDefault();
+          document.getElementById('work').scrollIntoView({ behavior: 'smooth' });
+          openProjectModal(index);
+          
+          if (window.innerWidth <= 768) {
+            sidebar.classList.remove('open-mobile');
+          }
+        });
+
+        sidebarProjectsList.appendChild(subItem);
+      });
+    }
+
+    // 2. Open project detail overlay window
+    window.openProjectModal = function(index) {
+      const card = projectCards[index];
+      if (!card) return;
+      
+      const template = card.querySelector('.project-details-template');
+      if (!template) return;
+
+      const clone = template.content.cloneNode(true);
+      modalBodyContent.innerHTML = '';
+      modalBodyContent.appendChild(clone);
+      
+      projectModalOverlay.classList.add('active');
+    };
+
+    // 3. Close modal logic
+    window.closeProjectModal = function(e) {
+      if (e) e.preventDefault();
+      projectModalOverlay.classList.remove('active');
+    };
+
+    // Close on Escape key press
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && projectModalOverlay.classList.contains('active')) {
+        closeProjectModal();
+      }
+    });
+
+
+    // ==========================================================================
+    // PLAIN CAROUSEL COMPONENT (NO STACKS, ONE ACTIVE SLIDE ONLY)
+    // ==========================================================================
+    const carouselSlides = Array.from(document.querySelectorAll('.carousel-slide'));
+    let activeSlideIndex = 0;
+    let isCarouselMoving = false;
+
+    function updateCarousel() {
+      carouselSlides.forEach((slide, index) => {
+        if (index === activeSlideIndex) {
+          slide.classList.add('active');
+        } else {
+          slide.classList.remove('active');
+        }
+      });
+    }
+
+    function cycleCarousel(direction) {
+      if (isCarouselMoving || carouselSlides.length <= 1) return;
+      isCarouselMoving = true;
+
+      if (direction === 'left') {
+        activeSlideIndex = (activeSlideIndex - 1 + carouselSlides.length) % carouselSlides.length;
+      } else {
+        activeSlideIndex = (activeSlideIndex + 1) % carouselSlides.length;
+      }
+
+      updateCarousel();
+      
+      // Slight debounce for slide transitions
+      setTimeout(() => {
+        isCarouselMoving = false;
+      }, 400);
+    }
+
+    // Navigation hot spots click bindings
+    document.getElementById('carouselLeftBtn').addEventListener('click', (e) => {
+      e.stopPropagation();
+      cycleCarousel('left');
+    });
+    document.getElementById('carouselRightBtn').addEventListener('click', (e) => {
+      e.stopPropagation();
+      cycleCarousel('right');
+    });
+
+    // Touch Swiping Support for Carousel Slides
+    let swipeStartX = 0;
+    const slidesWrapper = document.getElementById('carouselSlidesWrapper');
+    slidesWrapper.addEventListener('touchstart', (e) => {
+      swipeStartX = e.touches[0].clientX;
+    }, { passive: true });
+
+    slidesWrapper.addEventListener('touchend', (e) => {
+      const swipeEndX = e.changedTouches[0].clientX;
+      const difference = swipeEndX - swipeStartX;
+
+      if (difference > 55) {
+        cycleCarousel('left'); // Swipe Right
+      } else if (difference < -55) {
+        cycleCarousel('right'); // Swipe Left
+      }
+    }, { passive: true });
+
+
+    // ==========================================================================
+    // ANIMATED MORPHING PHOTO BLOB CANVAS
+    // ==========================================================================
+    const blobCanvas = document.getElementById('blobCanvas');
+    const blobCtx = blobCanvas.getContext('2d');
+    
+    // Canvas sizing setup
+    const blobSize = 250;
+    blobCanvas.width = blobSize * window.devicePixelRatio;
+    blobCanvas.height = blobSize * window.devicePixelRatio;
+    blobCtx.scale(window.devicePixelRatio, window.devicePixelRatio);
+
+    const centerX = blobSize / 2;
+    const centerY = blobSize / 2;
+    const baseRadius = 75;
+    
+    let blobTime = 0;
+    let blobSpeed = 0.015;
+    
+    // Check if user set data-image overlay path
+    const imageUrl = blobCanvas.dataset.image;
+    let overlayImage = null;
+    let isImageLoaded = false;
+
+    if (imageUrl && imageUrl.trim() !== '') {
+      overlayImage = new Image();
+      overlayImage.src = imageUrl;
+      overlayImage.onload = () => {
+        isImageLoaded = true;
+      };
+      overlayImage.onerror = () => {
+        console.warn("Failed to load blob portrait image source path:", imageUrl);
+      };
+    }
+
+    blobCanvas.addEventListener('click', () => {
+      blobSpeed = blobSpeed === 0.015 ? 0.045 : blobSpeed === 0.045 ? 0.005 : 0.015;
+    });
+
+    function animateBlob() {
+      blobCtx.clearRect(0, 0, blobSize, blobSize);
+      
+      blobTime += blobSpeed;
+
+      const numPoints = 180;
+      blobCtx.beginPath();
+      
+      for (let i = 0; i < numPoints; i++) {
+        const angle = (i * Math.PI) / 90;
+        
+        const offset = Math.sin(angle * 3 + blobTime * 1.5) * 15 +
+                       Math.cos(angle * 5 - blobTime * 0.8) * 8 +
+                       Math.sin(angle * 2 + blobTime * 0.4) * 6;
+        
+        const radius = baseRadius + offset;
+        const x = centerX + Math.cos(angle) * radius;
+        const y = centerY + Math.sin(angle) * radius;
+        
+        if (i === 0) {
+          blobCtx.moveTo(x, y);
+        } else {
+          blobCtx.lineTo(x, y);
+        }
+      }
+      
+      blobCtx.closePath();
+      blobCtx.save();
+      
+      if (isImageLoaded && overlayImage) {
+        blobCtx.clip();
+        
+        const imgAspect = overlayImage.width / overlayImage.height;
+        let drawWidth, drawHeight, drawX, drawY;
+        
+        if (imgAspect > 1) {
+          drawHeight = blobSize;
+          drawWidth = blobSize * imgAspect;
+          drawX = (blobSize - drawWidth) / 2;
+          drawY = 0;
+        } else {
+          drawWidth = blobSize;
+          drawHeight = blobSize / imgAspect;
+          drawX = 0;
+          drawY = (blobSize - drawHeight) / 2;
+        }
+        
+        blobCtx.drawImage(overlayImage, drawX, drawY, drawWidth, drawHeight);
+      } else {
+        const gradient = blobCtx.createRadialGradient(centerX - 10, centerY - 10, 10, centerX, centerY, baseRadius + 20);
+        gradient.addColorStop(0, currentAccentLight);
+        gradient.addColorStop(1, currentAccent);
+        
+        blobCtx.fillStyle = gradient;
+        blobCtx.fill();
+        
+        blobCtx.fillStyle = 'rgba(0, 0, 0, 0.07)';
+        blobCtx.fill();
+
+        blobCtx.fillStyle = '#FFF';
+        blobCtx.font = "bold 9px 'JetBrains Mono', monospace";
+        blobCtx.textAlign = 'center';
+        blobCtx.textBaseline = 'middle';
+        blobCtx.shadowColor = 'rgba(0, 0, 0, 0.25)';
+        blobCtx.shadowBlur = 4;
+        
+        blobCtx.fillText("[EDIT]", centerX, centerY - 16);
+        blobCtx.fillText("REPLACE PHOTO", centerX, centerY);
+        blobCtx.fillText("IN HTML", centerX, centerY + 16);
+      }
+      
+      blobCtx.restore();
+
+      blobCtx.shadowBlur = 0;
+      blobCtx.setLineDash([5, 5]);
+      blobCtx.strokeStyle = currentAccent;
+      blobCtx.lineWidth = 2.5;
+      blobCtx.stroke();
+      blobCtx.setLineDash([]);
+
+      requestAnimationFrame(animateBlob);
+    }
+
+
+    // ==========================================================================
+    // FLOATING CANVAS PARTICLES SYSTEM
+    // ==========================================================================
+    const particlesCanvas = document.getElementById('bgParticlesCanvas');
+    const partCtx = particlesCanvas.getContext('2d');
+
+    let particles = [];
+    let particleCount = 60;
+
+    function resizeParticlesCanvas() {
+      particlesCanvas.width = window.innerWidth;
+      particlesCanvas.height = window.innerHeight;
+      
+      if (window.innerWidth < 768) {
+        particleCount = 20;
+      } else if (window.innerWidth < 1024) {
+        particleCount = 40;
+      } else {
+        particleCount = 60;
+      }
+
+      initParticles();
+    }
+
+    class Particle {
+      constructor() {
+        this.reset(true);
+      }
+
+      reset(init = false) {
+        this.x = Math.random() * particlesCanvas.width;
+        this.y = init ? Math.random() * particlesCanvas.height : particlesCanvas.height + 20;
+        this.size = Math.random() * 3 + 1;
+        this.speedX = Math.random() * 0.4 - 0.2;
+        this.speedY = -(Math.random() * 0.5 + 0.15);
+        this.opacity = Math.random() * 0.35 + 0.1;
+      }
+
+      update() {
+        this.x += this.speedX;
+        this.y += this.speedY;
+
+        if (this.x < -10) this.x = particlesCanvas.width + 10;
+        if (this.x > particlesCanvas.width + 10) this.x = -10;
+
+        if (this.y < -20) {
+          this.reset(false);
+        }
+      }
+
+      draw() {
+        partCtx.beginPath();
+        partCtx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        
+        partCtx.fillStyle = currentAccent;
+        partCtx.globalAlpha = this.opacity;
+        partCtx.fill();
+        partCtx.globalAlpha = 1.0;
+      }
+    }
+
+    function initParticles() {
+      particles = [];
+      for (let i = 0; i < particleCount; i++) {
+        particles.push(new Particle());
+      }
+    }
+
+    function animateParticles() {
+      partCtx.clearRect(0, 0, particlesCanvas.width, particlesCanvas.height);
+      
+      particles.forEach(p => {
+        p.update();
+        p.draw();
+      });
+
+      requestAnimationFrame(animateParticles);
+    }
+
+    let resizeTimeout;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(resizeParticlesCanvas, 150);
+    });
+
+
+    // ==========================================================================
+    // INITIALIZATION FUNCTION ON DOM CONTENT LOADED
+    // ==========================================================================
+    document.addEventListener('DOMContentLoaded', () => {
+      // 1. Setup system theme variables
+      initTheme();
+
+      // 2. Generate Work section items in sidebar sub-bullets dynamically
+      generateSidebarProjects();
+
+      // 3. Initiate plain carousel positions
+      updateCarousel();
+
+      // 4. Fire up background floating particles
+      resizeParticlesCanvas();
+      animateParticles();
+
+      // 5. Fire up the morphing blob outline
+      animateBlob();
+    });
+  </script>
+</body>
+</html>
