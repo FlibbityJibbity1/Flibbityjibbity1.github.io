@@ -14,14 +14,14 @@
 
   <style>
     /* ==========================================================================
-       DESIGN SYSTEM & CSS VARIABLES (DARK MODE ONLY WITH TERRACOTTA ACCENT)
+       DESIGN SYSTEM & CSS VARIABLES
        ========================================================================== */
     :root {
       /* Typography */
       --font-heading: 'Michroma', sans-serif;
       --font-body: 'JetBrains Mono', monospace;
 
-      /* Strictly Dark Theme Warm Earth Tones */
+      /* Dark Theme Base Warm Earth Tones */
       --bg-main: rgba(26, 25, 24, 0.9);   /* Translucent dark warm base for drifting particles */
       --bg-body-underlay: #1A1918;
       --bg-window: #252321;      /* GNOME window bg */
@@ -46,6 +46,20 @@
       --transition-speed: 0.3s;
     }
 
+    /* Light Theme Overrides */
+    body[data-theme="light"] {
+      --bg-main: rgba(245, 242, 238, 0.95);
+      --bg-body-underlay: #F5F2EE;
+      --bg-window: #EBE7E0;
+      --bg-sidebar: #DFDAD1;
+      --bg-card: #FAF8F5;
+      --bg-input: #E4DFD7;
+      --text-primary: #252321;
+      --text-secondary: #666059;
+      --border-color: #CDC7BD;
+      --shadow-color: rgba(0, 0, 0, 0.15);
+    }
+
     /* Base Reset & Core Styles */
     * {
       box-sizing: border-box;
@@ -62,6 +76,7 @@
       height: 100vh;
       overflow: hidden;
       position: relative;
+      transition: background-color var(--transition-speed) ease, color var(--transition-speed) ease;
     }
 
     /* Full-screen Background Particle Canvas */
@@ -104,6 +119,7 @@
       display: flex;
       flex-direction: column;
       overflow: hidden;
+      transition: background-color var(--transition-speed) ease;
     }
 
     /* Window Headerbar */
@@ -117,6 +133,7 @@
       padding: 0 16px;
       user-select: none;
       flex-shrink: 0;
+      transition: background-color var(--transition-speed) ease, border-color var(--transition-speed) ease;
     }
 
     .headerbar-left, .headerbar-right {
@@ -163,7 +180,7 @@
       position: relative;
     }
 
-    /* Collapsible Left Sidebar (COLLAPSED BY DEFAULT) */
+    /* Collapsible Left Sidebar */
     .gnome-sidebar {
       width: 280px;
       background-color: var(--bg-sidebar);
@@ -172,7 +189,7 @@
       flex-direction: column;
       justify-content: space-between;
       flex-shrink: 0;
-      transition: width var(--transition-speed) ease, transform var(--transition-speed) ease;
+      transition: width var(--transition-speed) ease, transform var(--transition-speed) ease, background-color var(--transition-speed) ease, border-color var(--transition-speed) ease;
       z-index: 10;
     }
 
@@ -213,6 +230,12 @@
       border: 1px solid var(--accent-color-dark);
       background-image: var(--noise-bg);
       background-blend-mode: overlay;
+      cursor: pointer;
+      user-select: none;
+      transition: transform 0.2s ease, background-color var(--transition-speed) ease;
+    }
+    .avatar:hover {
+      transform: scale(1.05);
     }
     .profile-info {
       display: flex;
@@ -226,9 +249,16 @@
     .profile-sub {
       font-size: 0.75rem;
       color: var(--text-secondary);
+      cursor: pointer;
+      user-select: none;
+      transition: color 0.2s ease;
+    }
+    .profile-sub:hover {
+      color: var(--accent-color);
+      text-decoration: underline;
     }
 
-    /* Navigation Links (No Icons) */
+    /* Navigation Links */
     .sidebar-nav {
       display: flex;
       flex-direction: column;
@@ -301,6 +331,7 @@
       overflow: hidden;
       text-overflow: ellipsis;
       transition: background 0.2s ease, color 0.2s ease;
+      cursor: pointer;
     }
     .nav-sub-item:hover {
       background-color: var(--bg-card);
@@ -370,9 +401,7 @@
       flex-shrink: 0;
     }
 
-    /* ==========================================================================
-       TAGLINE NEWS MARQUEE (INLINE LINE BREAK)
-       ========================================================================== */
+    /* Tagline Marquee */
     .section-title .tagline-marquee {
       flex-grow: 1;
       min-width: 0;
@@ -406,7 +435,7 @@
     }
 
     /* ==========================================================================
-       HOME SECTION (PLAIN STATIC/HORIZONTAL CAROUSEL)
+       HOME SECTION
        ========================================================================== */
     .intro-grid {
       display: grid;
@@ -485,29 +514,18 @@
       width: 100%;
       flex-grow: 1;
       border: 1px solid rgba(255,255,255,0.03);
-      background-size: cover;
-      background-position: center;
       position: relative;
       overflow: hidden;
       background-color: var(--bg-sidebar);
     }
 
-    /* Fallback colorful gradients */
-    .polaroid-placeholder-gradient {
+    .carousel-image-container img {
       width: 100%;
       height: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #FFF;
-      font-family: var(--font-heading);
-      font-size: 0.8rem;
-      text-transform: uppercase;
-      text-align: center;
-      padding: 20px;
+      object-fit: cover;
+      display: block;
     }
 
-    /* Little title caption at the bottom of the photo box wrapper */
     .carousel-caption {
       font-family: var(--font-body);
       font-size: 0.9rem;
@@ -519,7 +537,6 @@
       padding-top: 8px;
     }
 
-    /* Hotspot Arrows for Carousel Navigation */
     .carousel-nav-hotspots {
       position: absolute;
       top: 0;
@@ -564,7 +581,7 @@
     }
 
     /* ==========================================================================
-       ABOUT SECTION (FULL PAGE WIDTH INTERSPERSED BIO LAYOUT WITH 3 PICTURES)
+       ABOUT SECTION
        ========================================================================== */
     .about-fullwidth {
       width: 100%;
@@ -602,55 +619,27 @@
       min-width: 250px;
     }
 
-    /* Custom Photo Placeholder Card Styles (Separated from Canvas) */
     .bio-photo-card {
       width: 250px;
       height: 250px;
       background: var(--bg-card);
       border: 2px dashed var(--accent-color);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      color: var(--text-secondary);
-      font-size: 0.75rem;
-      font-weight: bold;
-      text-transform: uppercase;
-      text-align: center;
-      padding: 20px;
+      overflow: hidden;
+      padding: 0;
       position: relative;
       box-shadow: 0 4px 12px var(--shadow-color);
       transition: border-color var(--transition-speed) ease, background-color var(--transition-speed) ease;
     }
     .bio-photo-card:hover {
       border-style: solid;
-      background-color: var(--bg-sidebar);
     }
     .bio-photo-card img {
       width: 100%;
       height: 100%;
       object-fit: cover;
-      position: absolute;
-      top: 0;
-      left: 0;
+      display: block;
     }
 
-    #blobCanvas {
-      width: 250px;
-      height: 250px;
-      cursor: pointer;
-      filter: drop-shadow(0 8px 16px var(--shadow-color));
-    }
-
-    .meta-location {
-      font-family: var(--font-heading);
-      font-size: 0.85rem;
-      color: var(--accent-color);
-      margin-bottom: 12px;
-      display: inline-block;
-    }
-
-    /* Responsive Stacking for Bio Rows */
     @media (max-width: 820px) {
       .bio-row, .bio-row.reverse {
         flex-direction: column;
@@ -663,7 +652,7 @@
     }
 
     /* ==========================================================================
-       WORK SECTION (GNOME GRID VIEW)
+       WORK SECTION
        ========================================================================== */
     .project-grid {
       display: grid;
@@ -696,15 +685,6 @@
       border-bottom: 1px solid var(--border-color);
       position: relative;
     }
-    .project-thumb-label {
-      font-family: var(--font-heading);
-      font-size: 0.8rem;
-      color: #FFF;
-      text-shadow: 0 2px 4px rgba(0,0,0,0.5);
-      text-transform: uppercase;
-      text-align: center;
-      padding: 0 10px;
-    }
 
     .project-body {
       padding: 16px;
@@ -720,14 +700,8 @@
       color: var(--text-primary);
     }
 
-    .project-card-desc {
-      font-size: 0.8rem;
-      color: var(--text-secondary);
-      line-height: 1.5;
-    }
-
     /* ==========================================================================
-       SKILLS SECTION (BULLETED LIST LAYOUT - NO ICONS)
+       SKILLS SECTION (BULLETED LIST LAYOUT)
        ========================================================================== */
     .skills-grid-list {
       display: grid;
@@ -752,7 +726,7 @@
     }
 
     /* ==========================================================================
-       CONTACT & FOOTER (NO ICONS)
+       CONTACT & FOOTER
        ========================================================================== */
     .contact-layout {
       display: grid;
@@ -790,7 +764,6 @@
       color: var(--accent-color);
     }
 
-    /* Contact Form (Styled like Gnome Settings Form) */
     .contact-form {
       display: flex;
       flex-direction: column;
@@ -850,7 +823,6 @@
       box-shadow: 0 4px 8px rgba(0,0,0,0.15);
     }
 
-    /* Vintage Status Bar (Window Footer) */
     .statusbar {
       height: 28px;
       background-color: var(--bg-sidebar);
@@ -867,7 +839,7 @@
     }
 
     /* ==========================================================================
-       GNOME SYSTEM DETAIL MODAL WINDOW (NO ICONS)
+       GNOME SYSTEM DETAIL MODAL WINDOW
        ========================================================================== */
     .modal-overlay {
       position: fixed;
@@ -1022,9 +994,7 @@
       background-color: var(--border-color);
     }
 
-    /* ==========================================================================
-       RESPONSIVE ADAPTATIONS (MOBILE)
-       ========================================================================== */
+    /* Responsive Adaptations */
     @media (max-width: 900px) {
       .intro-grid {
         grid-template-columns: 1fr;
@@ -1055,7 +1025,6 @@
         height: calc(100% - 54px);
       }
 
-      /* Drawer-style sidebar on mobile */
       .gnome-sidebar {
         position: absolute;
         top: 0;
@@ -1072,7 +1041,6 @@
         box-shadow: 10px 0 30px rgba(0,0,0,0.3);
       }
 
-      /* When collapsed on mobile, it should stay offscreen */
       .gnome-sidebar.collapsed {
         width: 280px !important;
         transform: translateX(-100%);
@@ -1104,7 +1072,7 @@
       <h2 class="window-title">Jack of no trades, master of some</h2>
 
       <div class="headerbar-right">
-        </div>
+      </div>
     </header>
 
     <div class="window-body">
@@ -1113,10 +1081,10 @@
         <div class="sidebar-content">
           
           <div class="sidebar-profile">
-            <div class="avatar">MB</div>
+            <div class="avatar" title="Click to toggle Light/Dark Mode">MB</div>
             <div class="profile-info">
               <span class="profile-name">Miguel Beltran</span>
-              <span class="profile-sub">Please hire me I'm very broke</span>
+              <span class="profile-sub" title="Click to cycle accent colors">Please hire me I'm very broke</span>
             </div>
           </div>
 
@@ -1130,7 +1098,7 @@
                 <span class="nav-group-arrow open">▶</span>
               </button>
               <div class="nav-group-items open" id="sidebarProjectsList">
-                </div>
+              </div>
             </div>
 
             <a href="#skills" class="nav-item" id="nav-skills">Skills</a>
@@ -1162,36 +1130,28 @@
                   
                   <div class="carousel-slide active" data-index="0">
                     <div class="carousel-image-container">
-                      <div class="polaroid-placeholder-gradient" style="background: linear-gradient(135deg, #A85A32, #DDD7C9);">
-                        Stage Production
-                      </div>
+                      <img src="Into%20the%20woods.jpg" alt="Into the Woods (Encores!)">
                     </div>
                     <div class="carousel-caption">Into the Woods (Encores!)</div>
                   </div>
 
                   <div class="carousel-slide" data-index="1">
                     <div class="carousel-image-container">
-                      <div class="polaroid-placeholder-gradient" style="background: linear-gradient(135deg, #606C38, #282523);">
-                        Illustration award
-                      </div>
+                      <img src="baruch%20newsies.png" alt="Baruch College Newsies Award">
                     </div>
                     <div class="carousel-caption">Baruch college newsies award</div>
                   </div>
 
                   <div class="carousel-slide" data-index="2">
                     <div class="carousel-image-container">
-                      <div class="polaroid-placeholder-gradient" style="background: linear-gradient(135deg, #C68B45, #1E1C1A);">
-                        Classical choir
-                      </div>
+                      <img src="All%20city.png" alt="Carnegie Hall Chorus">
                     </div>
                     <div class="carousel-caption">Carnige hall w/ ACC</div>
                   </div>
 
                   <div class="carousel-slide" data-index="3">
                     <div class="carousel-image-container">
-                      <div class="polaroid-placeholder-gradient" style="background: linear-gradient(135deg, #4E6E81, #E8E2D5);">
-                        Homelab setup server
-                      </div>
+                      <img src="Homelab.png" alt="Homelab Server Setup">
                     </div>
                     <div class="carousel-caption">Running home server</div>
                   </div>
@@ -1226,11 +1186,10 @@
           
           <div class="about-fullwidth">
             
-
             <div class="bio-row">
               <div class="bio-pic-container">
-                <div class="bio-photo-card" title="Placeholder Photo 3">
-                  <span>[EDIT] Mugshot</span>
+                <div class="bio-photo-card" title="Miguel Beltran Profile">
+                  <img src="Picture%20of%20me%20for%20profile%20and%20mugshot.jpg" alt="Miguel Beltran Profile">
                 </div>
               </div>
               <div class="bio-text-block">
@@ -1242,8 +1201,8 @@
 
             <div class="bio-row reverse">
               <div class="bio-pic-container">
-                <div class="bio-photo-card" title="Placeholder Photo 2">
-                  <span>[EDIT] Performance photo</span>
+                <div class="bio-photo-card" title="Performance Photo">
+                  <img src="Oliver.png" alt="Oliver Revival Performance">
                 </div>
               </div>
               <div class="bio-text-block">
@@ -1255,8 +1214,8 @@
 
             <div class="bio-row">
               <div class="bio-pic-container">
-                <div class="bio-photo-card" title="Placeholder Photo 3">
-                  <span>[EDIT] Server taped to wall</span>
+                <div class="bio-photo-card" title="Server Setup">
+                  <img src="Server.jpg" alt="Home Server Setup">
                 </div>
               </div>
               <div class="bio-text-block">
@@ -1283,8 +1242,7 @@
           <div class="project-grid">
 
             <div class="project-card" onclick="openProjectModal(0)">
-              <div class="project-thumb" style="background: linear-gradient(135deg, var(--accent-color), var(--border-color));">
-                <span class="project-thumb-label">Intrusion Lab</span>
+              <div class="project-thumb" style="background-image: url('Server.jpg');">
               </div>
               <div class="project-body">
                 <h3 class="project-card-title">Cybersecurity Homelab</h3>
@@ -1293,11 +1251,10 @@
               <template class="project-details-template">
                 <h3 class="modal-project-title">Cybersecurity Homelab</h3>
                 <span class="modal-project-field">Infrastructure & SecOps</span>
-                <div class="modal-hero-thumb" style="background: linear-gradient(135deg, var(--accent-color), var(--border-color));">
-                  <span class="project-thumb-label" style="font-size: 1.2rem;">Homelab Infrastructure</span>
+                <div class="modal-hero-thumb" style="background-image: url('Server.jpg');">
                 </div>
                 <p class="modal-project-desc">
-                  In this project, I used a 2014 mac mini running debian server as a docker host (via casaos) to run things like Jellyfin (DVD/VHS collection backup), Immich (family photo backup), and minecraft servers (allow me *some* frivolities).
+                  In this project, I used a old laptop from my local flea market running debian server as a docker host (via casaos) to run things like Jellyfin (DVD/VHS collection backup), Immich (family photo backup), and minecraft servers (allow me *some* frivolities).
                 </p>
                 <div class="modal-project-tags">
                   <span class="tag">Docker</span>
@@ -1313,8 +1270,7 @@
             </div>
 
             <div class="project-card" onclick="openProjectModal(1)">
-              <div class="project-thumb" style="background: linear-gradient(135deg, var(--accent-color-light), var(--accent-color-dark));">
-                <span class="project-thumb-label">Choral Vocals</span>
+              <div class="project-thumb" style="background-image: url('Into%20the%20woods.jpg');">
               </div>
               <div class="project-body">
                 <h3 class="project-card-title">Into The Woods Revival</h3>
@@ -1323,8 +1279,7 @@
               <template class="project-details-template">
                 <h3 class="modal-project-title">Into The Woods revival</h3>
                 <span class="modal-project-field">Vocal Performance & Theater</span>
-                <div class="modal-hero-thumb" style="background: linear-gradient(135deg, var(--accent-color-light), var(--accent-color-dark));">
-                  <span class="project-thumb-label" style="font-size: 1.2rem;">Stage Production</span>
+                <div class="modal-hero-thumb" style="background-image: url('Into%20the%20woods.jpg');">
                 </div>
                 <p class="modal-project-desc">
                   Performed along with other precocious middle schoolers as a part of a community ensemble, working with professionals like Neil Patrick Harris, James Ortiz, Gavin Creel, and more.
@@ -1342,8 +1297,7 @@
             </div>
 
             <div class="project-card" onclick="openProjectModal(2)">
-              <div class="project-thumb" style="background: linear-gradient(135deg, var(--accent-color-dark), var(--border-color));">
-                <span class="project-thumb-label">Stage Ensemble</span>
+              <div class="project-thumb" style="background-image: url('Oliver.png');">
               </div>
               <div class="project-body">
                 <h3 class="project-card-title">Oliver! revival</h3>
@@ -1352,8 +1306,7 @@
               <template class="project-details-template">
                 <h3 class="modal-project-title">Oliver! Ensemble</h3>
                 <span class="modal-project-field">Theatrical Vocal Performance</span>
-                <div class="modal-hero-thumb" style="background: linear-gradient(135deg, var(--accent-color-dark), var(--border-color));">
-                  <span class="project-thumb-label" style="font-size: 1.2rem;">Lionel Bart's Oliver!</span>
+                <div class="modal-hero-thumb" style="background-image: url('Oliver.png');">
                 </div>
                 <p class="modal-project-desc">
                   Performed with a team of about 30 other students in NYCC's 2023 revival of Oliver!, getting a taste for the inner workings of a stage production, and working with professionals like Lili Cooper & Raul Esparza.
@@ -1371,8 +1324,7 @@
             </div>
 
             <div class="project-card" onclick="openProjectModal(3)">
-              <div class="project-thumb" style="background: linear-gradient(135deg, var(--bg-sidebar), var(--accent-color));">
-                <span class="project-thumb-label">Comic/illustration snippet</span>
+              <div class="project-thumb" style="background-image: url('illustration.png');">
               </div>
               <div class="project-body">
                 <h3 class="project-card-title">Illustration</h3>
@@ -1381,11 +1333,10 @@
               <template class="project-details-template">
                 <h3 class="modal-project-title">Newspaper illustration</h3>
                 <span class="modal-project-field">Cartooning</span>
-                <div class="modal-hero-thumb" style="background: linear-gradient(135deg, var(--bg-sidebar), var(--accent-color));">
-                  <span class="project-thumb-label" style="font-size: 1.2rem;">Electronics Bench</span>
+                <div class="modal-hero-thumb" style="background-image: url('illustration.png');">
                 </div>
                 <p class="modal-project-desc">
-                  Since 2024, I have been leading the illustation department for my school's newspaper (QHSS, #1 school in NYC as per USschools), and my own contributions have recieved 2 awards from the Newsies- an awards organization run by baruch college celebrating excellence in high school journalism.
+                  Since 2024, I have been leading the illustration department for my school's newspaper (QHSS, #1 school in NYC as per USschools), and my own contributions have received 2 awards from the Newsies- an awards organization run by Baruch College celebrating excellence in high school journalism.
                 </p>
                 <div class="modal-project-tags">
                   <span class="tag">2d Illustration</span>
@@ -1419,11 +1370,11 @@
             <li>Computer Diagnostics & Repair</li>
             <li>Singing (solo, chorus)</li>
             <li>Stage performance</li>
-            <li>Writing (stage, film)<li>
+            <li>Writing (stage, film)</li>
             <li>2d Illustration</li>
             <li>Basic networking</li>
             <li>3d printing</li>
-            <li>3d modeling (sculture/CAD)<li>
+            <li>3d modeling (sculpture/CAD)</li>
           </ul>
         </section>
 
@@ -1484,7 +1435,7 @@
     </div>
 
     <footer class="statusbar">
-      <span>Theme: Dark (Terracotta Accent)</span>
+      <span id="themeStatusBarText">Theme: Dark Mode</span>
       <span id="statusBarScroll">Miguel Beltran Portfolio v1.0.0</span>
     </footer>
 
@@ -1499,50 +1450,60 @@
         </button>
       </div>
       <div class="modal-body" id="modalBodyContent">
-        </div>
+      </div>
     </div>
   </div>
 
   <script>
     // ==========================================================================
-    // SAFE LOCAL STORAGE WRAPPER (Prevents crashes in sandboxed double-clicked environments)
+    // THEME AND EARTH TONE ACCENT CONTROLLERS
     // ==========================================================================
-    const safeStorage = {
-      getItem(key) {
-        try {
-          return localStorage.getItem(key);
-        } catch (e) {
-          return null;
-        }
-      },
-      setItem(key, value) {
-        try {
-          localStorage.setItem(key, value);
-        } catch (e) {
-          // Fail silently without halting script execution
-        }
-      }
-    };
+    let currentTheme = 'dark';
+    
+    // Earth Tone Palettes Array for "Please hire me..." click cycling
+    const earthToneAccents = [
+      { name: 'Terracotta', accent: '#C05C3E', light: '#D47B62', dark: '#9F432A' },
+      { name: 'Burnt Sienna', accent: '#A85A32', light: '#C4784F', dark: '#883E1A' },
+      { name: 'Warm Ochre', accent: '#8C6D46', light: '#AA8C63', dark: '#6E5230' },
+      { name: 'Sage Green', accent: '#6B7A59', light: '#889874', dark: '#4E5B3E' },
+      { name: 'Copper', accent: '#B87333', light: '#D18D4F', dark: '#94581C' },
+      { name: 'Espresso Rust', accent: '#7A4B3A', light: '#996754', dark: '#5C3324' },
+      { name: 'Warm Amber', accent: '#C28D4B', light: '#D9AA6A', dark: '#9E6E30' }
+    ];
+    let currentAccentIndex = 0;
 
-    // ==========================================================================
-    // THEME AND COLOR CONTROLLERS (FORCE DARK & TERRACOTTA ONLY)
-    // ==========================================================================
-    const currentTheme = 'dark';
-    const currentAccent = '#C05C3E';
-    const currentAccentLight = '#D47B62';
-    const currentAccentDark = '#9F432A';
-
-    // Theme initialization
     function initTheme() {
       document.body.setAttribute('data-theme', currentTheme);
-      setAccentColors(currentAccent, currentAccentLight, currentAccentDark);
+      const palette = earthToneAccents[currentAccentIndex];
+      setAccentColors(palette.accent, palette.light, palette.dark);
     }
 
-    // Set accent colors inside :root variables
+    function toggleTheme() {
+      currentTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      document.body.setAttribute('data-theme', currentTheme);
+      updateStatusBar();
+    }
+
+    function cycleAccentColor() {
+      currentAccentIndex = (currentAccentIndex + 1) % earthToneAccents.length;
+      const palette = earthToneAccents[currentAccentIndex];
+      setAccentColors(palette.accent, palette.light, palette.dark);
+      updateStatusBar();
+    }
+
     function setAccentColors(accent, light, dark) {
       document.documentElement.style.setProperty('--accent-color', accent);
       document.documentElement.style.setProperty('--accent-color-light', light);
       document.documentElement.style.setProperty('--accent-color-dark', dark);
+    }
+
+    function updateStatusBar() {
+      const themeStatus = document.getElementById('themeStatusBarText');
+      if (themeStatus) {
+        const themeCap = currentTheme.charAt(0).toUpperCase() + currentTheme.slice(1);
+        const paletteName = earthToneAccents[currentAccentIndex].name;
+        themeStatus.textContent = `Theme: ${themeCap} (${paletteName} Accent)`;
+      }
     }
 
 
@@ -1555,13 +1516,32 @@
     const navItems = document.querySelectorAll('.nav-item');
     const contentSections = document.querySelectorAll('.content-section');
 
+    // Sidebar navigation click to smooth-scroll section
+    navItems.forEach(item => {
+      item.addEventListener('click', (e) => {
+        if (item.classList.contains('nav-group-trigger')) return;
+        
+        const href = item.getAttribute('href');
+        if (href && href.startsWith('#')) {
+          e.preventDefault();
+          const targetSection = document.querySelector(href);
+          if (targetSection) {
+            targetSection.scrollIntoView({ behavior: 'smooth' });
+          }
+        }
+
+        if (window.innerWidth <= 768) {
+          sidebar.classList.remove('open-mobile');
+        }
+      });
+    });
+
     // Sidebar navigation active highlight tracker
     mainContent.addEventListener('scroll', () => {
       let currentSection = 'home';
       
       contentSections.forEach(section => {
         const sectionTop = section.offsetTop;
-        const sectionHeight = section.clientHeight;
         if (mainContent.scrollTop >= (sectionTop - 120)) {
           currentSection = section.getAttribute('id');
         }
@@ -1582,16 +1562,6 @@
       } else {
         sidebar.classList.toggle('collapsed');
       }
-    });
-
-    // Close mobile menu drawer on nav clicks
-    navItems.forEach(item => {
-      item.addEventListener('click', (e) => {
-        if (item.classList.contains('nav-group-trigger')) return;
-        if (window.innerWidth <= 768) {
-          sidebar.classList.remove('open-mobile');
-        }
-      });
     });
 
     // Projects group toggle list animation inside Sidebar
@@ -1622,9 +1592,9 @@
     const projectModalOverlay = document.getElementById('projectModalOverlay');
     const modalBodyContent = document.getElementById('modalBodyContent');
 
-    // 1. Build sub-navigation links dynamically in the sidebar based on project entries in the HTML!
+    // Build sub-navigation links dynamically in the sidebar based on project entries
     function generateSidebarProjects() {
-      sidebarProjectsList.innerHTML = ''; // Reset
+      sidebarProjectsList.innerHTML = '';
       projectCards.forEach((card, index) => {
         const titleElement = card.querySelector('.project-card-title');
         if (!titleElement) return;
@@ -1635,10 +1605,12 @@
         subItem.innerText = titleElement.innerText;
         subItem.title = titleElement.innerText;
 
-        // Clicking sub-item redirects context and triggers project overlay window
         subItem.addEventListener('click', (e) => {
           e.preventDefault();
-          document.getElementById('work').scrollIntoView({ behavior: 'smooth' });
+          const workSection = document.getElementById('work');
+          if (workSection) {
+            workSection.scrollIntoView({ behavior: 'smooth' });
+          }
           openProjectModal(index);
           
           if (window.innerWidth <= 768) {
@@ -1650,7 +1622,6 @@
       });
     }
 
-    // 2. Open project detail overlay window
     window.openProjectModal = function(index) {
       const card = projectCards[index];
       if (!card) return;
@@ -1665,13 +1636,11 @@
       projectModalOverlay.classList.add('active');
     };
 
-    // 3. Close modal logic
     window.closeProjectModal = function(e) {
       if (e) e.preventDefault();
       projectModalOverlay.classList.remove('active');
     };
 
-    // Close on Escape key press
     window.addEventListener('keydown', (e) => {
       if (e.key === 'Escape' && projectModalOverlay.classList.contains('active')) {
         closeProjectModal();
@@ -1680,7 +1649,7 @@
 
 
     // ==========================================================================
-    // PLAIN CAROUSEL COMPONENT (NO STACKS, ONE ACTIVE SLIDE ONLY)
+    // PLAIN CAROUSEL COMPONENT
     // ==========================================================================
     const carouselSlides = Array.from(document.querySelectorAll('.carousel-slide'));
     let activeSlideIndex = 0;
@@ -1708,13 +1677,11 @@
 
       updateCarousel();
       
-      // Slight debounce for slide transitions
       setTimeout(() => {
         isCarouselMoving = false;
       }, 400);
     }
 
-    // Navigation hot spots click bindings
     document.getElementById('carouselLeftBtn').addEventListener('click', (e) => {
       e.stopPropagation();
       cycleCarousel('left');
@@ -1724,7 +1691,6 @@
       cycleCarousel('right');
     });
 
-    // Touch Swiping Support for Carousel Slides
     let swipeStartX = 0;
     const slidesWrapper = document.getElementById('carouselSlidesWrapper');
     slidesWrapper.addEventListener('touchstart', (e) => {
@@ -1736,134 +1702,11 @@
       const difference = swipeEndX - swipeStartX;
 
       if (difference > 55) {
-        cycleCarousel('left'); // Swipe Right
+        cycleCarousel('left');
       } else if (difference < -55) {
-        cycleCarousel('right'); // Swipe Left
+        cycleCarousel('right');
       }
     }, { passive: true });
-
-
-    // ==========================================================================
-    // ANIMATED MORPHING PHOTO BLOB CANVAS
-    // ==========================================================================
-    const blobCanvas = document.getElementById('blobCanvas');
-    const blobCtx = blobCanvas.getContext('2d');
-    
-    // Canvas sizing setup
-    const blobSize = 250;
-    blobCanvas.width = blobSize * window.devicePixelRatio;
-    blobCanvas.height = blobSize * window.devicePixelRatio;
-    blobCtx.scale(window.devicePixelRatio, window.devicePixelRatio);
-
-    const centerX = blobSize / 2;
-    const centerY = blobSize / 2;
-    const baseRadius = 75;
-    
-    let blobTime = 0;
-    let blobSpeed = 0.015;
-    
-    // Check if user set data-image overlay path
-    const imageUrl = blobCanvas.dataset.image;
-    let overlayImage = null;
-    let isImageLoaded = false;
-
-    if (imageUrl && imageUrl.trim() !== '') {
-      overlayImage = new Image();
-      overlayImage.src = imageUrl;
-      overlayImage.onload = () => {
-        isImageLoaded = true;
-      };
-      overlayImage.onerror = () => {
-        console.warn("Failed to load blob portrait image source path:", imageUrl);
-      };
-    }
-
-    blobCanvas.addEventListener('click', () => {
-      blobSpeed = blobSpeed === 0.015 ? 0.045 : blobSpeed === 0.045 ? 0.005 : 0.015;
-    });
-
-    function animateBlob() {
-      blobCtx.clearRect(0, 0, blobSize, blobSize);
-      
-      blobTime += blobSpeed;
-
-      const numPoints = 180;
-      blobCtx.beginPath();
-      
-      for (let i = 0; i < numPoints; i++) {
-        const angle = (i * Math.PI) / 90;
-        
-        const offset = Math.sin(angle * 3 + blobTime * 1.5) * 15 +
-                       Math.cos(angle * 5 - blobTime * 0.8) * 8 +
-                       Math.sin(angle * 2 + blobTime * 0.4) * 6;
-        
-        const radius = baseRadius + offset;
-        const x = centerX + Math.cos(angle) * radius;
-        const y = centerY + Math.sin(angle) * radius;
-        
-        if (i === 0) {
-          blobCtx.moveTo(x, y);
-        } else {
-          blobCtx.lineTo(x, y);
-        }
-      }
-      
-      blobCtx.closePath();
-      blobCtx.save();
-      
-      if (isImageLoaded && overlayImage) {
-        blobCtx.clip();
-        
-        const imgAspect = overlayImage.width / overlayImage.height;
-        let drawWidth, drawHeight, drawX, drawY;
-        
-        if (imgAspect > 1) {
-          drawHeight = blobSize;
-          drawWidth = blobSize * imgAspect;
-          drawX = (blobSize - drawWidth) / 2;
-          drawY = 0;
-        } else {
-          drawWidth = blobSize;
-          drawHeight = blobSize / imgAspect;
-          drawX = 0;
-          drawY = (blobSize - drawHeight) / 2;
-        }
-        
-        blobCtx.drawImage(overlayImage, drawX, drawY, drawWidth, drawHeight);
-      } else {
-        const gradient = blobCtx.createRadialGradient(centerX - 10, centerY - 10, 10, centerX, centerY, baseRadius + 20);
-        gradient.addColorStop(0, currentAccentLight);
-        gradient.addColorStop(1, currentAccent);
-        
-        blobCtx.fillStyle = gradient;
-        blobCtx.fill();
-        
-        blobCtx.fillStyle = 'rgba(0, 0, 0, 0.07)';
-        blobCtx.fill();
-
-        blobCtx.fillStyle = '#FFF';
-        blobCtx.font = "bold 9px 'JetBrains Mono', monospace";
-        blobCtx.textAlign = 'center';
-        blobCtx.textBaseline = 'middle';
-        blobCtx.shadowColor = 'rgba(0, 0, 0, 0.25)';
-        blobCtx.shadowBlur = 4;
-        
-        blobCtx.fillText("[EDIT]", centerX, centerY - 16);
-        blobCtx.fillText("REPLACE PHOTO", centerX, centerY);
-        blobCtx.fillText("IN HTML", centerX, centerY + 16);
-      }
-      
-      blobCtx.restore();
-
-      blobCtx.shadowBlur = 0;
-      blobCtx.setLineDash([5, 5]);
-      blobCtx.strokeStyle = currentAccent;
-      blobCtx.lineWidth = 2.5;
-      blobCtx.stroke();
-      blobCtx.setLineDash([]);
-
-      requestAnimationFrame(animateBlob);
-    }
 
 
     // ==========================================================================
@@ -1920,7 +1763,7 @@
         partCtx.beginPath();
         partCtx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
         
-        partCtx.fillStyle = currentAccent;
+        partCtx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--accent-color').trim();
         partCtx.globalAlpha = this.opacity;
         partCtx.fill();
         partCtx.globalAlpha = 1.0;
@@ -1953,24 +1796,26 @@
 
 
     // ==========================================================================
-    // INITIALIZATION FUNCTION ON DOM CONTENT LOADED
+    // INITIALIZATION & INTERACTION BINDINGS
     // ==========================================================================
     document.addEventListener('DOMContentLoaded', () => {
-      // 1. Setup system theme variables
       initTheme();
-
-      // 2. Generate Work section items in sidebar sub-bullets dynamically
       generateSidebarProjects();
-
-      // 3. Initiate plain carousel positions
       updateCarousel();
-
-      // 4. Fire up background floating particles
       resizeParticlesCanvas();
       animateParticles();
 
-      // 5. Fire up the morphing blob outline
-      animateBlob();
+      // Profile avatar click -> Toggle Light/Dark mode
+      const avatar = document.querySelector('.avatar');
+      if (avatar) {
+        avatar.addEventListener('click', toggleTheme);
+      }
+
+      // "Please hire me..." text click -> Cycle earth tone accent colors
+      const profileSub = document.querySelector('.profile-sub');
+      if (profileSub) {
+        profileSub.addEventListener('click', cycleAccentColor);
+      }
     });
   </script>
 </body>
