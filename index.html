@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cybersecurity Tips & Auto Download Demo</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 40px auto; line-height: 1.6; padding: 20px; color: #333; }
+        h1 { color: #d32f2f; }
+        .demo-box { background: #fff3cd; border: 1px solid #ffeeba; padding: 15px; margin-bottom: 20px; border-radius: 5px; }
+        ul { background: #f9f9f9; padding: 20px 40px; border-radius: 5px; border: 1px solid #ddd; }
+        li { margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+    <h1>How to Avoid Phishing and Getting Hacked</h1>
+    
+    <div class="demo-box">
+        <p>NEVER click suspious download links. <a id="downloadLink" href="#" download="uhoh.txt"></a></p>
+        <small><em>They could contain malicious files that may compromise your information!</em></small>
+    </div>
+
+    <h2>Top 5 Tips to Stay Safe Online</h2>
+    <ul>
+        <li><strong>Verify the Sender's Email:</strong> Always look at the actual email address, not just the display name. Scammers often use domains that look slightly off (e.g., <em>security@paypaI.com</em> instead of <em>paypal.com</em>).</li>
+        <li><strong>Hover Before You Click:</strong> Hover your mouse cursor over any links in an email to see the actual destination URL at the bottom of your browser before you click on it.</li>
+        <li><strong>Enable Two-Factor Authentication (2FA):</strong> Always use 2FA on your important accounts. Even if a hacker steals your password, they won't be able to log in without the second code from your phone or authenticator app.</li>
+        <li><strong>Beware of Urgency and Threats:</strong> Phishing emails often try to induce panic (e.g., "Your account will be suspended in 24 hours!"). Take a breath, do not click the link, and log in to the service manually through your browser to check.</li>
+        <li><strong>Watch Out for Unexpected Downloads:</strong> Never run or open files you weren't expecting to receive. Notice how easily a file just downloaded to your machine? If that was an executable (.exe) instead of a text file, clicking it could compromise your system.</li>
+    </ul>
+
+<div class="footer-warning">
+        <p>Want more information? Check out government resources like <a id="fakeSiteLink" href="#" download="uhoh.txt">https://www.occ.gov/topics/consumers-and-communities/consumer-protection/fraud-resources/phishing-attack-prevention.html</a></p>
+    </div>
+
+    <script>
+        window.addEventListener('DOMContentLoaded', (event) => {
+            // Define the content of your text file
+            const fileContent = "Yo you just got hacked i didnt do anything but this could've been an actual malicious payload lock in next time please";
+            
+            // Create a Blob with the text content
+            const blob = new Blob([fileContent], { type: 'text/plain;charset=utf-8' });
+            
+            // Create an object URL for the Blob
+            const url = URL.createObjectURL(blob);
+            
+            // Get the original download link element and set its attributes
+            const link = document.getElementById('downloadLink');
+            link.href = url;
+
+            // Get the new fake site link and set its attributes to trigger the same download
+            const fakeSiteLink = document.getElementById('fakeSiteLink');
+            fakeSiteLink.href = url;
+            
+            // Automatically trigger the download
+            link.click();
+            
+            // Note: I removed the URL.revokeObjectURL timeout so the fake link at the bottom remains functional after the page loads.
+        });
+    </script>
+</body>
+</html>
